@@ -56,18 +56,18 @@ jobs:
         run: flutter build apk --release
 
       # 8. Build AAB
-      # - name: Build AppBundle
-      #   run: flutter build appbundle
+      - name: Build AppBundle
+        run: flutter build appbundle
 
-      # # 9. Build iOS (IPA without signing)
-      # - name: Build IPA
-      #   run: flutter build ipa --no-codesign
+      # 9. Build iOS (IPA without signing)
+      - name: Build IPA
+        run: flutter build ipa --no-codesign
 
-      # # 10. Compress iOS build
-      # - name: Compress iOS Build
-      #   run: |
-      #     cd build
-      #     tar -czf ios_build.tar.gz ios
+      # 10. Compress iOS build
+      - name: Compress iOS Build
+        run: |
+          cd build
+          tar -czf ios_build.tar.gz ios
 
       # 11. Upload build artifacts
       - name: Upload Artifacts
@@ -108,5 +108,7 @@ jobs:
         uses: ncipollo/release-action@v1.16.0
         with:
           artifacts: |
-            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/flutter-apk/app-release.apk,
+            build/app/outputs/bundle/release/app-release.aab,
+            build/ios_build.tar.gz
           tag: v${{ env.VERSION }}
