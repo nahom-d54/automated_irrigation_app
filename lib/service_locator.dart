@@ -13,11 +13,11 @@ import 'package:irrigation_app/presentation/blocs/notification/notification_bloc
 
 class ServiceLocator {
   static final ServiceLocator _instance = ServiceLocator._internal();
-  
+
   factory ServiceLocator() => _instance;
-  
+
   ServiceLocator._internal();
-  
+
   final SensorDataLocalSource _localDataSource = SensorDataLocalSource();
   late final SensorDataHttpSource _httpDataSource;
   late final SensorDataSocketIOSource _socketIOSource;
@@ -28,29 +28,32 @@ class ServiceLocator {
   late final AuthBloc _authBloc;
   late final NotificationBloc _notificationBloc;
   late final ConnectivityChecker _connectivityChecker;
-  
+
   void initialize() {
     // Initialize data sources
-    _httpDataSource = SensorDataHttpSource();
     _authDataSource = AuthDataSource();
+    _httpDataSource = SensorDataHttpSource(_authDataSource);
     _socketIOSource = SensorDataSocketIOSource(_authDataSource);
-    
+
     // Initialize repositories
     _sensorRepository = SensorDataRepositoryImpl(
       localDataSource: _localDataSource,
       httpDataSource: _httpDataSource,
       socketIOSource: _socketIOSource,
     );
-    
+
     _authRepository = AuthRepositoryImpl(
       authDataSource: _authDataSource,
     );
-    
+
     // Initialize BLoCs
     _sensorDataBloc = SensorDataBloc(repository: _sensorRepository);
-    _authBloc = AuthBloc(authRepository: _authRepository);
+    _authBloc = AuthBloc(
+        authRepository: _authRepository,
+        authDataSource: _authDataSource,
+        socket: _socketIOSource);
     _notificationBloc = NotificationBloc();
-    
+
     // Initialize connectivity checker
     _connectivityChecker = ConnectivityChecker((isConnected) {
       if (isConnected) {
@@ -59,14 +62,14 @@ class ServiceLocator {
         _sensorDataBloc.add(DisconnectSocket());
       }
     });
-    
+
     _connectivityChecker.initialize();
   }
-  
+
   SensorDataBloc get sensorDataBloc => _sensorDataBloc;
   AuthBloc get authBloc => _authBloc;
   NotificationBloc get notificationBloc => _notificationBloc;
-  
+
   void dispose() {
     _sensorDataBloc.close();
     _authBloc.close();
