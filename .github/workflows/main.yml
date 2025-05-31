@@ -56,18 +56,18 @@ jobs:
         run: flutter build apk --release
 
       # 8. Build AAB
-      - name: Build AppBundle
-        run: flutter build appbundle
+      # - name: Build AppBundle
+      #   run: flutter build appbundle
 
-      # 9. Build iOS (IPA without signing)
-      - name: Build IPA
-        run: flutter build ipa --no-codesign
+      # # 9. Build iOS (IPA without signing)
+      # - name: Build IPA
+      #   run: flutter build ipa --no-codesign
 
-      # 10. Compress iOS build
-      - name: Compress iOS Build
-        run: |
-          cd build
-          tar -czf ios_build.tar.gz ios
+      # # 10. Compress iOS build
+      # - name: Compress iOS Build
+      #   run: |
+      #     cd build
+      #     tar -czf ios_build.tar.gz ios
 
       # 11. Upload build artifacts
       - name: Upload Artifacts
