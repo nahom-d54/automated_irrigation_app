@@ -10,46 +10,49 @@ class AuthDataSource {
   final FlutterSecureStorage secureStorage;
 
   static const String _accessTokenKey = 'access_token';
-  static const String _refreshTokenKey = 'refresh_token';
+  // static const String _refreshTokenKey = 'refresh_token';
   static const String _userDataKey = 'user_data';
 
   AuthDataSource({
     this.baseUrl = 'https://integrated.ai.astu.pro.et',
     http.Client? httpClient,
     FlutterSecureStorage? secureStorage,
-  }) : httpClient = httpClient ?? http.Client(),
+  })  : httpClient = httpClient ?? http.Client(),
         secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   Future<LoginResponse> login(LoginRequest request) async {
     try {
       final uri = Uri.parse('$baseUrl/api/auth/login');
-    
 
-      final response = await httpClient.post(
+      final response = await httpClient
+          .post(
         uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: json.encode(request.toJson()),
-      ).timeout(
+      )
+          .timeout(
         const Duration(seconds: 30),
         onTimeout: () {
           throw Exception('Login request timeout');
         },
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final loginResponse = LoginResponse.fromJson(json.decode(response.body));
-        
-        // Store tokens securely
+        final loginResponse =
+            LoginResponse.fromJson(json.decode(response.body));
+
+        // Store tokens securelyfin
         await _storeTokens(loginResponse);
-        
+        // Retrieve user data from response
+
         // Store user data
-        await secureStorage.write(
-          key: _userDataKey,
-          value: json.encode(loginResponse.user),
-        );
-        
+        // await secureStorage.write(
+        //   key: _userDataKey,
+        //   value: json.encode(loginResponse.user),
+        // );
+
         return loginResponse;
       } else {
         throw Exception('Invalid credential');
@@ -62,22 +65,22 @@ class AuthDataSource {
   Future<UserModel> register(RegisterRequest request) async {
     try {
       final uri = Uri.parse('$baseUrl/api/auth/register');
-      
 
-      final response = await httpClient.post(
+      final response = await httpClient
+          .post(
         uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: json.encode(request.toJson()),
-      ).timeout(
+      )
+          .timeout(
         const Duration(seconds: 30),
         onTimeout: () {
           throw Exception('Registration request timeout');
         },
       );
-
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final userData = json.decode(response.body);
@@ -98,7 +101,7 @@ class AuthDataSource {
       }
 
       final uri = Uri.parse('$baseUrl/api/auth/me');
-      
+
       final response = await httpClient.get(
         uri,
         headers: {
@@ -116,17 +119,17 @@ class AuthDataSource {
       if (response.statusCode == 200) {
         final userData = json.decode(response.body);
         final user = UserModel.fromJson(userData['user'] ?? userData);
-        
+
         // Update stored user data
         await secureStorage.write(
           key: _userDataKey,
           value: json.encode(userData['user'] ?? userData),
         );
-        
+
         return user;
       } else if (response.statusCode == 401) {
         // Token expired, try to refresh
-        await refreshToken();
+        // await refreshToken();
         return getCurrentUser(); // Retry with new token
       } else {
         throw Exception('Failed to get user data');
@@ -137,45 +140,46 @@ class AuthDataSource {
     }
   }
 
-  Future<void> refreshToken() async {
-    try {
-      final refreshTokenValue = await getRefreshToken();
-      if (refreshTokenValue == null) {
-        throw Exception('No refresh token found');
-      }
+  // Future<void> refreshToken() async {
+  //   try {
+  //     final refreshTokenValue = await getRefreshToken();
+  //     if (refreshTokenValue == null) {
+  //       throw Exception('No refresh token found');
+  //     }
 
-      final uri = Uri.parse('$baseUrl/api/auth/refresh');
-      
-      final response = await httpClient.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode({
-          'refresh_token': refreshTokenValue,
-        }),
-      );
+  //     final uri = Uri.parse('$baseUrl/api/auth/refresh');
 
-      if (response.statusCode == 200) {
-        final loginResponse = LoginResponse.fromJson(json.decode(response.body));
-        await _storeTokens(loginResponse);
-      } else {
-        throw Exception('Failed to refresh token');
-      }
-    } catch (e) {
-      await logout(); // Clear invalid tokens
-      rethrow;
-    }
-  }
+  //     final response = await httpClient.post(
+  //       uri,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Accept': 'application/json',
+  //       },
+  //       body: json.encode({
+  //         'refresh_token': refreshTokenValue,
+  //       }),
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final loginResponse =
+  //           LoginResponse.fromJson(json.decode(response.body));
+  //       await _storeTokens(loginResponse);
+  //     } else {
+  //       throw Exception('Failed to refresh token');
+  //     }
+  //   } catch (e) {
+  //     await logout(); // Clear invalid tokens
+  //     rethrow;
+  //   }
+  // }
 
   Future<void> logout() async {
     try {
       final token = await getAccessToken();
-      
+
       if (token != null) {
         final uri = Uri.parse('$baseUrl/api/auth/logout');
-        
+
         await httpClient.post(
           uri,
           headers: {
@@ -198,9 +202,9 @@ class AuthDataSource {
     return await secureStorage.read(key: _accessTokenKey);
   }
 
-  Future<String?> getRefreshToken() async {
-    return await secureStorage.read(key: _refreshTokenKey);
-  }
+  // Future<String?> getRefreshToken() async {
+  //   return await secureStorage.read(key: _refreshTokenKey);
+  // }
 
   Future<UserModel?> getStoredUser() async {
     try {
@@ -225,15 +229,15 @@ class AuthDataSource {
       key: _accessTokenKey,
       value: loginResponse.accessToken,
     );
-    await secureStorage.write(
-      key: _refreshTokenKey,
-      value: loginResponse.refreshToken,
-    );
+    // await secureStorage.write(
+    //   key: _refreshTokenKey,
+    //   value: loginResponse.refreshToken,
+    // );
   }
 
   Future<void> _clearStoredData() async {
     await secureStorage.delete(key: _accessTokenKey);
-    await secureStorage.delete(key: _refreshTokenKey);
+    // await secureStorage.delete(key: _refreshTokenKey);
     await secureStorage.delete(key: _userDataKey);
   }
 

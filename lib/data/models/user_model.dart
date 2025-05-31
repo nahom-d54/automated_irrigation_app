@@ -17,7 +17,7 @@ class UserModel extends User {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id']?.toString() ?? '',
-      email: json['email'] ?? '', 
+      email: json['email'] ?? '',
       firstName: json['first_name'] ?? json['firstName'] ?? '',
       lastName: json['last_name'] ?? json['lastName'] ?? '',
       role: _parseUserRole(json['is_superuser']),
@@ -33,8 +33,8 @@ class UserModel extends User {
 
   static UserRole _parseUserRole(dynamic role) {
     if (role == null) return UserRole.viewer;
-    
-    if (role as bool==true){
+
+    if (role as bool == true) {
       return UserRole.admin;
     }
     return UserRole.operator;
@@ -51,13 +51,13 @@ class UserModel extends User {
 
   static DateTime _parseDateTime(dynamic dateTime) {
     if (dateTime == null) return DateTime.now();
-    
+
     if (dateTime is String) {
       return DateTime.parse(dateTime);
     } else if (dateTime is num) {
       return DateTime.fromMillisecondsSinceEpoch((dateTime * 1000).toInt());
     }
-    
+
     return DateTime.now();
   }
 

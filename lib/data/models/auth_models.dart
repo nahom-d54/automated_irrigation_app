@@ -17,26 +17,26 @@ class LoginRequest {
 
 class LoginResponse {
   final String accessToken;
-  final String refreshToken;
+  // final String refreshToken;
   final String tokenType;
-  final int expiresIn;
-  final Map<String, dynamic> user;
+  // final int expiresIn;
+  // final Map<String, dynamic> user;
 
   LoginResponse({
     required this.accessToken,
-    required this.refreshToken,
+    // required this.refreshToken,
     required this.tokenType,
-    required this.expiresIn,
-    required this.user,
+    // required this.expiresIn,
+    // required this.user,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       accessToken: json['access_token'] ?? json['accessToken'] ?? '',
-      refreshToken: json['refresh_token'] ?? json['refreshToken'] ?? '',
+      // refreshToken: json['refresh_token'] ?? json['refreshToken'] ?? '',
       tokenType: json['token_type'] ?? json['tokenType'] ?? 'Bearer',
-      expiresIn: json['expires_in'] ?? json['expiresIn'] ?? 3600,
-      user: json['user'] ?? {},
+      // expiresIn: json['expires_in'] ?? json['expiresIn'] ?? 3600,
+      // user: json['user'] ?? {},
     );
   }
 }
@@ -46,24 +46,23 @@ class RegisterRequest {
   final String password;
   final String firstName;
   final String lastName;
-  final String? role;
+  final String? username;
 
   RegisterRequest({
     required this.email,
     required this.password,
     required this.firstName,
     required this.lastName,
-    this.role,
+    this.username,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'username':firstName,
+      'username': firstName,
       'email': email,
       'password': password,
       'first_name': firstName,
       'last_name': lastName,
-      if (role != null) 'role': role,
     };
   }
 }

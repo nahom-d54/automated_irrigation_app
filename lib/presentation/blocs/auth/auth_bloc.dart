@@ -81,7 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.lastName,
       );
       emit(AuthAuthenticated(user: user));
-    } catch ( e) {
+    } catch (e) {
       emit(AuthError(message: 'Regestration failed, Please try agin!'));
     }
   }
@@ -105,11 +105,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      await authRepository.refreshToken();
+      // await authRepository.refreshToken();
       final user = await authRepository.getCurrentUser();
       emit(AuthAuthenticated(user: user));
     } catch (e) {
       emit(AuthUnauthenticated());
     }
   }
-} 
+}

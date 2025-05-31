@@ -11,12 +11,13 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<User> login(String email, String password) async {
     final request = LoginRequest(email: email, password: password);
-     await authDataSource.login(request);
+    await authDataSource.login(request);
     return await authDataSource.getCurrentUser();
   }
 
   @override
-  Future<User> register(String email, String password, String firstName, String lastName) async {
+  Future<User> register(
+      String email, String password, String firstName, String lastName) async {
     final request = RegisterRequest(
       email: email,
       password: password,
@@ -46,8 +47,8 @@ class AuthRepositoryImpl implements AuthRepository {
     return await authDataSource.getStoredUser();
   }
 
-  @override
-  Future<void> refreshToken() async {
-    await authDataSource.refreshToken();
-  }
+  // @override
+  // Future<void> refreshToken() async {
+  //   await authDataSource.refreshToken();
+  // }
 }
