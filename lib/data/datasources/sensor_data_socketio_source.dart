@@ -33,6 +33,21 @@ class SensorDataSocketIOSource {
   Stream<ConnectionStatus> get connectionStatus =>
       _connectionStatusController.stream;
 
+  bool _is403Error(dynamic error) {
+    try {
+      // Adjust based on how your backend returns errors
+      if (error is Map && error['status'] == 403) return true;
+      if (error.toString().contains('403')) return true;
+    } catch (_) {}
+    return false;
+  }
+
+  void _handle403Logout() {
+    disconnect(); // make sure socket is closed
+    dataSource.logout(); // or however you handle user session
+    print("403 detected — logging out");
+  }
+
   Future<void> connect() async {
     if (_isDisposed) return;
 
@@ -89,12 +104,20 @@ class SensorDataSocketIOSource {
 
     _socket!.onConnectError((error) {
       print('Socket.IO connection error: $error');
-      _connectionStatusController.add(ConnectionStatus.error);
+      if (_is403Error(error)) {
+        _handle403Logout();
+      } else {
+        _connectionStatusController.add(ConnectionStatus.error);
+      }
     });
 
     _socket!.onError((error) {
       print('Socket.IO error: $error');
-      _connectionStatusController.add(ConnectionStatus.error);
+      if (_is403Error(error)) {
+        _handle403Logout();
+      } else {
+        _connectionStatusController.add(ConnectionStatus.error);
+      }
     });
 
     // Data events - handle real-time updates

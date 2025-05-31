@@ -3,13 +3,21 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:irrigation_app/domain/entities/user.dart';
 import 'package:irrigation_app/domain/repositories/auth_repository.dart';
+import 'package:irrigation_app/data/datasources/auth_data_source.dart';
+import 'package:irrigation_app/data/datasources/sensor_data_socketio_source.dart';
 part 'auth_state.dart';
 part 'auth_event.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
+  final AuthDataSource authDataSource;
+  final SensorDataSocketIOSource socket;
 
-  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
+  AuthBloc(
+      {required this.authDataSource,
+      required this.authRepository,
+      required this.socket})
+      : super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<AuthLoginRequested>(_onAuthLoginRequested);
     on<AuthRegisterRequested>(_onAuthRegisterRequested);
@@ -26,8 +34,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final isLoggedIn = await authRepository.isLoggedIn();
       if (isLoggedIn) {
         final user = await authRepository.getStoredUser();
-        if (user != null) {
+        final token = await authDataSource.getAccessToken();
+        if (token != null && token.isNotEmpty && user != null) {
+          // If token is not available, consider user unauthenticated
+          await socket.connect();
           emit(AuthAuthenticated(user: user));
+          return;
         } else {
           // Try to get fresh user data
           try {

@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:irrigation_app/data/models/sensor_data_model.dart';
+import 'package:irrigation_app/data/datasources/auth_data_source.dart';
 
 class SensorDataHttpSource {
   final String baseUrl;
   final http.Client httpClient;
+  AuthDataSource dataSource;
 
-  SensorDataHttpSource({
+  SensorDataHttpSource(
+    this.dataSource, {
     this.baseUrl = 'https://integrated.ai.astu.pro.et',
     http.Client? httpClient,
   }) : httpClient = httpClient ?? http.Client();
@@ -38,11 +41,14 @@ class SensorDataHttpSource {
 
       print('Fetching historical data from: $finalUri');
 
+      final token = await dataSource.getAccessToken();
+
       final response = await httpClient.get(
         finalUri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token', // Replace with your actual token
         },
       ).timeout(
         const Duration(seconds: 30),
@@ -110,11 +116,14 @@ class SensorDataHttpSource {
 
       print('Fetching latest sensor data from: $uri');
 
+      final token = await dataSource.getAccessToken();
+
       final response = await httpClient.get(
         uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token', // Replace with your actual token
         },
       ).timeout(
         const Duration(seconds: 30),
