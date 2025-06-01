@@ -94,7 +94,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthError(message: 'Regestration failed, Please try agin!'));
+      emit(AuthError(message: 'Registration failed, Please try agin!'));
     }
   }
 

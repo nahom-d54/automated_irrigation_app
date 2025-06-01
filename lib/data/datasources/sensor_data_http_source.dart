@@ -15,7 +15,7 @@ class SensorDataHttpSource {
   }) : httpClient = httpClient ?? http.Client();
 
   Future<List<SensorDataModel>> getHistoricalSensorData({
-    int? limit = 100,
+    int? limit,
     DateTime? startDate,
     DateTime? endDate,
   }) async {

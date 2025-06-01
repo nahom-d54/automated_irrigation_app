@@ -38,7 +38,7 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
       - name: Generate Icons
-        run: flutter pub run flutter_launcher_icons:main
+        run: flutter pub run flutter_launcher_icons
       # Uncomment the following steps if you need to handle keystore and signing
       # 5. Decode keystore from base64
       #   - name: Decode Keystore
